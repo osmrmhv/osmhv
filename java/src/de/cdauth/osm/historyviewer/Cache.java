@@ -79,22 +79,22 @@ public class Cache extends SQLite
 			for(int i=0; i<a_changes[0].length; i++)
 			{
 				nodeStatement.setInt(2, i);
-				nodeStatement.setBoolean(7, false);
+				nodeStatement.setBoolean(7, true);
 				for(int j=0; j<a_changes[0][i].length; j++)
 				{
 					nodeStatement.setInt(3, j);
 					nodeStatement.setLong(4, Long.parseLong(a_changes[0][i][j].getDOM().getAttribute("id")));
-					nodeStatement.setDouble(5, a_changes[0][i][j].getLonLat().getLon());
-					nodeStatement.setDouble(6, a_changes[0][i][j].getLonLat().getLat());
+					nodeStatement.setDouble(5, a_changes[0][i][j].getLonLat().getLat());
+					nodeStatement.setDouble(6, a_changes[0][i][j].getLonLat().getLon());
 					nodeStatement.execute();
 				}
-				nodeStatement.setBoolean(7, true);
+				nodeStatement.setBoolean(7, false);
 				for(int j=0; j<a_changes[1][i].length; j++)
 				{
 					nodeStatement.setInt(3, j);
 					nodeStatement.setLong(4, Long.parseLong(a_changes[1][i][j].getDOM().getAttribute("id")));
-					nodeStatement.setDouble(5, a_changes[1][i][j].getLonLat().getLon());
-					nodeStatement.setDouble(6, a_changes[1][i][j].getLonLat().getLat());
+					nodeStatement.setDouble(5, a_changes[1][i][j].getLonLat().getLat());
+					nodeStatement.setDouble(6, a_changes[1][i][j].getLonLat().getLon());
 					nodeStatement.execute();
 				}
 			}

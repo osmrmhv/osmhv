@@ -1,0 +1,3 @@
+#!/bin/bash
+cd "$(dirname "$(which "$0")")"
+find .. -name '*.php' | xgettext -f- -dosmhv -oosmhv.pot -LPHP --from-code=UTF-8 --add-comments="I18N:"
