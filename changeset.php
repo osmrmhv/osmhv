@@ -15,6 +15,27 @@
     You should have received a copy of the GNU Affero General Public License
     along with OSM History Viewer.  If not, see <http://www.gnu.org/licenses/>.
 */
+	function removeSegments($needle, &$haystack)
+	{
+		$ret = false;
+		foreach(array_keys($haystack) as $k)
+		{
+			if($haystack[$k] == $needle)
+			{
+				unset($haystack[$k]);
+				$ret = true;
+			}
+		}
+		return $ret;
+	}
+
+	function makeSegment($a, $b)
+	{
+		if($a[0] < $b[0] || ($a[0] == $b[0] && $a[1] < $b[1]))
+			return array($a, $b);
+		else
+			return array($b, $a);
+	}
 
 	require_once("include.php");
 
@@ -109,7 +130,7 @@
 	var map = new OpenLayers.Map.cdauth("map");
 	map.addAllAvailableLayers();
 
-	window.onresize = function(){ document.getElementById("map").style.height = Math.round(window.innerHeight*.8)+"px"; map.updateSize(); }
+	window.onresize = function(){ document.getElementById("map").style.height = Math.round(window.innerHeight*.9)+"px"; map.updateSize(); }
 	window.onresize();
 
 	var styleMapUnchanged = new OpenLayers.StyleMap({strokeColor: "#0000ff", strokeWidth: 3, strokeOpacity: 0.3});
@@ -123,23 +144,25 @@
 	click.activate();
 
 	var projection = new OpenLayers.Projection("EPSG:4326");
-	var layerCreated = new OpenLayers.Layer.PointTrack("Unchanged ways", {
+	var layerCreated = new OpenLayers.Layer.PointTrack("(Created)", {
 		styleMap: styleMapCreated,
-		projection: projection,
-		displayInLayerSwitcher: false
+		projection: projection
+		//displayInLayerSwitcher: false
 	});
-	var layerRemoved = new OpenLayers.Layer.PointTrack("Unchanged ways", {
+	var layerRemoved = new OpenLayers.Layer.PointTrack("(Removed)", {
 		styleMap: styleMapRemoved,
-		projection: projection,
-		displayInLayerSwitcher: false
+		projection: projection
+		//displayInLayerSwitcher: false
 	});
-	var layerUnchanged = new OpenLayers.Layer.PointTrack("Unchanged ways", {
+	var layerUnchanged = new OpenLayers.Layer.PointTrack("(Unchanged)", {
 		styleMap: styleMapUnchanged,
-		projection: projection,
-		displayInLayerSwitcher: false
+		projection: projection
+		//displayInLayerSwitcher: false
 	});
 <?php
 	$segments = $sql->query("SELECT DISTINCT segment FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"]).";");
+	$old_segments = array();
+	$new_segments = array();
 	while($segment = $segments->fetch())
 	{
 		$old = array();
@@ -152,13 +175,13 @@
 			if($point["old"])
 			{
 				if($old_last)
-					$old[] = array($old_last, array($point["lon"], $point["lat"]));
+					$old[] = makeSegment($old_last, array($point["lon"], $point["lat"]));
 				$old_last = array($point["lon"], $point["lat"]);
 			}
 			else
 			{
 				if($new_last)
-					$new[] = array($new_last, array($point["lon"], $point["lat"]));
+					$new[] = makeSegment($new_last, array($point["lon"], $point["lat"]));
 				$new_last = array($point["lon"], $point["lat"]);
 			}
 		}
@@ -182,22 +205,35 @@
 <?php
 		}
 
-		foreach($old as $old1)
-		{
-			$new_index = array_search($old1, $new);
-			$layer = "layer".($new_index === false ? "Removed" : "Unchanged");
+		if(count($old) > 0)
+			$old_segments = array_merge($old_segments, $old);
+		if(count($new) > 0)
+			$new_segments = array_merge($new_segments, $new);
+	}
+
+	foreach(array_keys($old_segments) as $k)
+	{
+		if(!isset($old_segments[$k]))
+			continue;
+		$old1 = &$old_segments[$k];
+		if(removeSegments($old1, &$new_segments))
+			$layer = "layerUnchanged";
+		else
+			$layer = "layerRemoved";
 ?>
 	<?=$layer?>.addNodes([new OpenLayers.Feature(<?=$layer?>, new OpenLayers.LonLat(<?=$old1[0][0]?>, <?=$old1[0][1]?>).transform(projection, map.getProjectionObject())), new OpenLayers.Feature(<?=$layer?>, new OpenLayers.LonLat(<?=$old1[1][0]?>, <?=$old1[1][1]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-			if($new_index !== false)
-				unset($new[$new_index]);
-		}
-		foreach($new as $new1)
-		{
+		removeSegments($old1, &$old_segments);
+	}
+	foreach(array_keys($new_segments) as $k)
+	{
+		if(!isset($new_segments[$k]))
+			continue;
+		$new1 = $new_segments[$k];
 ?>
 	layerCreated.addNodes([new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$new1[0][0]?>, <?=$new1[0][1]?>).transform(projection, map.getProjectionObject())), new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$new1[1][0]?>, <?=$new1[1][1]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-		}
+		removeSegments($new1, &$new_segments);
 	}
 ?>
 
