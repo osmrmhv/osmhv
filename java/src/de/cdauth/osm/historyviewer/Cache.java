@@ -22,24 +22,28 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Map;
 import de.cdauth.osm.basic.Changeset;
-import de.cdauth.osm.basic.Node;
 import de.cdauth.osm.basic.SQLite;
+import de.cdauth.osm.basic.Segment;
 
 public class Cache extends SQLite
 {
+	public static final int ACTION_REMOVE = 1;
+	public static final int ACTION_CREATE = 2;
+	public static final int ACTION_UNCHANGED = 3;
+
 	public Cache(String a_filename) throws ClassNotFoundException, SQLException
 	{
 		super(a_filename);
 	}
 
-	public void cacheChangesetChanges(Changeset a_changeset, Node[][][] a_changes, Calendar a_lastUpdate) throws SQLException
+	public void cacheChangesetChanges(Changeset a_changeset, Segment[][] a_changes, Calendar a_lastUpdate) throws SQLException
 	{
-		if(a_changes.length != 2)
+		if(a_changes.length != 3)
 			throw new IllegalArgumentException("This is not the return value of de.cdauth.osm.basic.RelationSegment.getNodeChanges().");
 
 		getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS changeset_information ( changeset LONG, created TEXT, closed TEXT, user TEXT, analysed INT );");
 		getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS changeset_tags ( changeset LONG, k TEXT, v TEXT );");
-		getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS changeset_changes ( changeset LONG, segment INT, i INT, id LONG, lat REAL, lon REAL, old BOOLEAN );");
+		getConnection().createStatement().execute("CREATE TABLE IF NOT EXISTS changeset_changes ( changeset LONG, id1 LONG, lat1 REAL, lon1 REAL, id2 LONG, lat2 REAL, lon2 REAL, action INT );");
 		getConnection().commit();
 		
 		long changesetID = Long.parseLong(a_changeset.getDOM().getAttribute("id"));
@@ -73,30 +77,43 @@ public class Cache extends SQLite
 				tagStatement.execute();
 			}
 
-			PreparedStatement nodeStatement = getConnection().prepareStatement("INSERT INTO changeset_changes ( changeset, segment, i, id, lat, lon, old ) VALUES ( ?, ?, ?, ?, ?, ?, ? );");
+			PreparedStatement nodeStatement = getConnection().prepareStatement("INSERT INTO changeset_changes ( changeset, id1, lat1, lon1, id2, lat2, lon2, action ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? );");
 			nodeStatement.setLong(1, changesetID);
-
-			for(int i=0; i<a_changes[0].length; i++)
+			
+			nodeStatement.setInt(8, ACTION_REMOVE);
+			for(Segment segment : a_changes[0])
 			{
-				nodeStatement.setInt(2, i);
-				nodeStatement.setBoolean(7, true);
-				for(int j=0; j<a_changes[0][i].length; j++)
-				{
-					nodeStatement.setInt(3, j);
-					nodeStatement.setLong(4, Long.parseLong(a_changes[0][i][j].getDOM().getAttribute("id")));
-					nodeStatement.setDouble(5, a_changes[0][i][j].getLonLat().getLat());
-					nodeStatement.setDouble(6, a_changes[0][i][j].getLonLat().getLon());
-					nodeStatement.execute();
-				}
-				nodeStatement.setBoolean(7, false);
-				for(int j=0; j<a_changes[1][i].length; j++)
-				{
-					nodeStatement.setInt(3, j);
-					nodeStatement.setLong(4, Long.parseLong(a_changes[1][i][j].getDOM().getAttribute("id")));
-					nodeStatement.setDouble(5, a_changes[1][i][j].getLonLat().getLat());
-					nodeStatement.setDouble(6, a_changes[1][i][j].getLonLat().getLon());
-					nodeStatement.execute();
-				}
+				nodeStatement.setLong(2, Long.parseLong(segment.getNode1().getDOM().getAttribute("id")));
+				nodeStatement.setDouble(3, segment.getNode1().getLonLat().getLat());
+				nodeStatement.setDouble(4, segment.getNode1().getLonLat().getLon());
+				nodeStatement.setLong(5, Long.parseLong(segment.getNode2().getDOM().getAttribute("id")));
+				nodeStatement.setDouble(6, segment.getNode2().getLonLat().getLat());
+				nodeStatement.setDouble(7, segment.getNode2().getLonLat().getLon());
+				nodeStatement.execute();
+			}
+			
+			nodeStatement.setInt(8, ACTION_CREATE);
+			for(Segment segment : a_changes[1])
+			{
+				nodeStatement.setLong(2, Long.parseLong(segment.getNode1().getDOM().getAttribute("id")));
+				nodeStatement.setDouble(3, segment.getNode1().getLonLat().getLat());
+				nodeStatement.setDouble(4, segment.getNode1().getLonLat().getLon());
+				nodeStatement.setLong(5, Long.parseLong(segment.getNode2().getDOM().getAttribute("id")));
+				nodeStatement.setDouble(6, segment.getNode2().getLonLat().getLat());
+				nodeStatement.setDouble(7, segment.getNode2().getLonLat().getLon());
+				nodeStatement.execute();
+			}
+			
+			nodeStatement.setInt(8, ACTION_UNCHANGED);
+			for(Segment segment : a_changes[2])
+			{
+				nodeStatement.setLong(2, Long.parseLong(segment.getNode1().getDOM().getAttribute("id")));
+				nodeStatement.setDouble(3, segment.getNode1().getLonLat().getLat());
+				nodeStatement.setDouble(4, segment.getNode1().getLonLat().getLon());
+				nodeStatement.setLong(5, Long.parseLong(segment.getNode2().getDOM().getAttribute("id")));
+				nodeStatement.setDouble(6, segment.getNode2().getLonLat().getLat());
+				nodeStatement.setDouble(7, segment.getNode2().getLonLat().getLon());
+				nodeStatement.execute();
 			}
 			
 			getConnection().commit();

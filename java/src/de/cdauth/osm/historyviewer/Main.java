@@ -26,12 +26,11 @@ import org.xml.sax.SAXException;
 import de.cdauth.cmdargs.Argument;
 import de.cdauth.cmdargs.ArgumentParser;
 import de.cdauth.cmdargs.ArgumentParserException;
+import de.cdauth.osm.basic.API;
 import de.cdauth.osm.basic.APIError;
 import de.cdauth.osm.basic.Changeset;
 import de.cdauth.osm.basic.ChangesetContent;
-import de.cdauth.osm.basic.Node;
-import de.cdauth.osm.basic.Relation;
-import de.cdauth.osm.basic.RelationSegment;
+import de.cdauth.osm.basic.Segment;
 
 public class Main
 {
@@ -39,6 +38,8 @@ public class Main
 
 	public static void main(String[] a_args) throws ArgumentParserException, ClassNotFoundException, SQLException, IOException, APIError, SAXException, ParserConfigurationException, ParseException
 	{
+		API.setUserAgent("OSM History Viewer");
+
 		ArgumentParser arguments = new ArgumentParser("OSM History Viewer");
 		
 		Argument token_changeset = new Argument('r', "changeset");
@@ -67,7 +68,7 @@ public class Main
 		{
 			Changeset changeset = Changeset.fetch(token_changeset.parameter());
 			ChangesetContent content = changeset.getContent();
-			Node[][][] changes = content.getNodeChanges();
+			Segment[][] changes = content.getNodeChanges();
 			sm_cache.cacheChangesetChanges(changeset, changes, downloadTime);
 			
 			System.out.println("Successfully saved changes of changeset "+changeset.getDOM().getAttribute("id")+".");

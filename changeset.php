@@ -160,80 +160,28 @@
 		//displayInLayerSwitcher: false
 	});
 <?php
-	$segments = $sql->query("SELECT DISTINCT segment FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"]).";");
-	$old_segments = array();
-	$new_segments = array();
+	$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 1;");
 	while($segment = $segments->fetch())
 	{
-		$old = array();
-		$new = array();
-		$old_last = null;
-		$new_last = null;
-		$points = $sql->query("SELECT lat, lon, old FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND segment = ".$sql->quote($segment["segment"])." ORDER BY i ASC;");
-		while($point = $points->fetch())
-		{
-			if($point["old"])
-			{
-				if($old_last)
-					$old[] = makeSegment($old_last, array($point["lon"], $point["lat"]));
-				$old_last = array($point["lon"], $point["lat"]);
-			}
-			else
-			{
-				if($new_last)
-					$new[] = makeSegment($new_last, array($point["lon"], $point["lat"]));
-				$new_last = array($point["lon"], $point["lat"]);
-			}
-		}
-
-		if(count($old) == 0 && $old_last && (count($new) != 0 || $old_last != $new_last))
-		{
 ?>
-	layerRemoved.addNodes([new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$old_last[0]?>, <?=$old_last[1]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$old_last[0]?>, <?=$old_last[1]?>).transform(projection, map.getProjectionObject()))]);
+	layerRemoved.addNodes([new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$segment["lon1"]?>, <?=$segment["lat1"]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$segment["lon2"]?>, <?=$segment["lat2"]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-		}
-		if(count($new) == 0 && $new_last && (count($old) != 0 || $new_last != $old_last))
-		{
-?>
-	layerCreated.addNodes([new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$new_last[0]?>, <?=$new_last[1]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$new_last[0]?>, <?=$new_last[1]?>).transform(projection, map.getProjectionObject()))]);
-<?php
-		}
-		if(count($old) == 0 && count($new) == 0 && $old_last && $old_last == $new_last)
-		{
-?>
-	layerUnchanged.addNodes([new OpenLayers.Feature(layerUnchanged, new OpenLayers.LonLat(<?=$old_last[0]?>, <?=$old_last[1]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerUnchanged, new OpenLayers.LonLat(<?=$old_last[0]?>, <?=$old_last[1]?>).transform(projection, map.getProjectionObject()))]);
-<?php
-		}
-
-		if(count($old) > 0)
-			$old_segments = array_merge($old_segments, $old);
-		if(count($new) > 0)
-			$new_segments = array_merge($new_segments, $new);
 	}
 
-	foreach(array_keys($old_segments) as $k)
+	$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 2;");
+	while($segment = $segments->fetch())
 	{
-		if(!isset($old_segments[$k]))
-			continue;
-		$old1 = &$old_segments[$k];
-		if(removeSegments($old1, &$new_segments))
-			$layer = "layerUnchanged";
-		else
-			$layer = "layerRemoved";
 ?>
-	<?=$layer?>.addNodes([new OpenLayers.Feature(<?=$layer?>, new OpenLayers.LonLat(<?=$old1[0][0]?>, <?=$old1[0][1]?>).transform(projection, map.getProjectionObject())), new OpenLayers.Feature(<?=$layer?>, new OpenLayers.LonLat(<?=$old1[1][0]?>, <?=$old1[1][1]?>).transform(projection, map.getProjectionObject()))]);
+	layerCreated.addNodes([new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$segment["lon1"]?>, <?=$segment["lat1"]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$segment["lon2"]?>, <?=$segment["lat2"]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-		removeSegments($old1, &$old_segments);
 	}
-	foreach(array_keys($new_segments) as $k)
+
+	$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 3;");
+	while($segment = $segments->fetch())
 	{
-		if(!isset($new_segments[$k]))
-			continue;
-		$new1 = $new_segments[$k];
 ?>
-	layerCreated.addNodes([new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$new1[0][0]?>, <?=$new1[0][1]?>).transform(projection, map.getProjectionObject())), new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$new1[1][0]?>, <?=$new1[1][1]?>).transform(projection, map.getProjectionObject()))]);
+	layerUnchanged.addNodes([new OpenLayers.Feature(layerUnchanged, new OpenLayers.LonLat(<?=$segment["lon1"]?>, <?=$segment["lat1"]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerUnchanged, new OpenLayers.LonLat(<?=$segment["lon2"]?>, <?=$segment["lat2"]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-		removeSegments($new1, &$new_segments);
 	}
 ?>
 
