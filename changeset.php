@@ -137,11 +137,9 @@
 	var styleMapCreated = new OpenLayers.StyleMap({strokeColor: "#44ff44", strokeWidth: 3, strokeOpacity: 0.5});
 	var styleMapRemoved = new OpenLayers.StyleMap({strokeColor: "#ff0000", strokeWidth: 3, strokeOpacity: 0.5});
 
-	var layerMarkers = new OpenLayers.Layer.cdauth.markers.LonLat("Markers", new OpenLayers.Icon('http://osm.cdauth.de/map/marker.png', new OpenLayers.Size(21,25), new OpenLayers.Pixel(-9, -25)));
+	var layerMarkers = new OpenLayers.Layer.cdauth.markers.LonLat("Markers");
 	map.addLayer(layerMarkers);
-	var click = new OpenLayers.Control.cdauth.MarkerClick(layerMarkers);
-	map.addControl(click);
-	click.activate();
+	layerMarkers.addClickControl();
 
 	var projection = new OpenLayers.Projection("EPSG:4326");
 	var layerCreated = new OpenLayers.Layer.PointTrack("(Created)", {
