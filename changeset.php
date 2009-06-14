@@ -40,8 +40,7 @@
 	require_once("include.php");
 
 	if(isset($_GET["id"]) && ($_GET["id"] = preg_replace("/^\\s*#?(.*)\\s*\$/", "\\1", $_GET["id"])) != "")
-			$GUI->option("title", sprintf(_("Changeset %s"), $_GET["id"]));
-	}
+		$GUI->option("title", sprintf(_("Changeset %s"), $_GET["id"]));
 
 	$GUI->option("importJavaScript", array(
 		"http://www.openlayers.org/dev/OpenLayers.js",
