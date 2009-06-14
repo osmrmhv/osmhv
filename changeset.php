@@ -39,12 +39,7 @@
 
 	require_once("include.php");
 
-	if(isset($_GET["id"]))
-	{
-		$_GET["id"] = trim($_GET["id"]);
-		if($_GET["id"][0] == '#')
-			$_GET["id"] = substr($_GET["id"], 1);
-		if($_GET["id"] != "")
+	if(isset($_GET["id"]) && ($_GET["id"] = preg_replace("/^\\s*#?(.*)\\s*\$/", "\\1", $_GET["id"])) != "")
 			$GUI->option("title", sprintf(_("Changeset %s"), $_GET["id"]));
 	}
 
