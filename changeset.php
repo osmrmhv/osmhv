@@ -137,7 +137,9 @@
 	var styleMapCreated = new OpenLayers.StyleMap({strokeColor: "#44ff44", strokeWidth: 3, strokeOpacity: 0.5});
 	var styleMapRemoved = new OpenLayers.StyleMap({strokeColor: "#ff0000", strokeWidth: 3, strokeOpacity: 0.5});
 
-	map.addLayer(new OpenLayers.Layer.cdauth.markers.OpenStreetBugs("OpenStreetBugs"));
+	var osbLayer = new OpenLayers.Layer.cdauth.markers.OpenStreetBugs("OpenStreetBugs", "../map/openstreetbugs.php", { visibility: false });
+	map.addLayer(osbLayer);
+	osbLayer.setZIndex(500);
 
 	var layerMarkers = new OpenLayers.Layer.cdauth.markers.LonLat("Markers");
 	map.addLayer(layerMarkers);
