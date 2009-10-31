@@ -48,7 +48,8 @@
 		"http://opentiles.com/nop/opentiles.js",
 		"http://maps.google.com/maps?file=api&v=2&key=ABQIAAAApZR0PIISH23foUX8nxj4LxT_x5xGo0Rzkn1YRNpahJvSZYku9hTJeTmkeyXv4TuaU5kM077xJUUM7w",
 		"http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=cdauths-map",
-		"http://osm.cdauth.de/map/prototypes.js"
+		"http://osm.cdauth.de/map/prototypes.js",
+		"http://osm.cdauth.de/map/openstreetbugs.js"
 	));
 
 	$GUI->head();
@@ -137,7 +138,7 @@
 	var styleMapCreated = new OpenLayers.StyleMap({strokeColor: "#44ff44", strokeWidth: 3, strokeOpacity: 0.5});
 	var styleMapRemoved = new OpenLayers.StyleMap({strokeColor: "#ff0000", strokeWidth: 3, strokeOpacity: 0.5});
 
-	var osbLayer = new OpenLayers.Layer.cdauth.markers.OpenStreetBugs("OpenStreetBugs", "../map/openstreetbugs.php", { visibility: false });
+	var osbLayer = new OpenLayers.Layer.OpenStreetBugs("OpenStreetBugs", { visibility: false });
 	map.addLayer(osbLayer);
 	osbLayer.setZIndex(500);
 
