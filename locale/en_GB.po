@@ -70,7 +70,7 @@ msgstr "Changed object tags"
 
 #: ../changeset.php:133
 msgid "No tags have been changed."
-msgstr "Changeset %s"
+msgstr "No tags have been changed."
 
 #: ../changeset.php:139
 msgid "Hover the elements to view the changed tags."
