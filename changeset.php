@@ -126,84 +126,94 @@
 	<dd><a href="http://www.openstreetmap.org/user/<?=htmlspecialchars(rawurlencode($information["user"]))?>"><?=htmlspecialchars($information["user"])?></a></dd>
 </dl>
 <h2><?=htmlspecialchars(_("Changed object tags"))?></h2>
+<?php
+	if(!$sql->query("SELECT COUNT(*) FROM changeset_tags_objects WHERE changeset = ".$sql->quote($_GET["id"]).";")->fetchColumn())
+	{
+?>
+<p class="nothing-to-do"><?=htmlspecialchars(_("No tags have been changed."))?></p>
+<?php
+	}
+	else
+	{
+?>
 <p class="changed-object-tags-note"><?=htmlspecialchars(_("Hover the elements to view the changed tags."))?></p>
 <ul class="changed-object-tags">
 <?php
-	$old_type = null;
-	$old_id = null;
-	$tags = $sql->query("SELECT * FROM changeset_tags_objects WHERE changeset = ".$sql->quote($_GET["id"]).";");
-	while($line = $tags->fetch())
-	{
-		if($line["type"] != $old_type || $line["id"] != $old_id)
+		$old_type = null;
+		$old_id = null;
+		$tags = $sql->query("SELECT * FROM changeset_tags_objects WHERE changeset = ".$sql->quote($_GET["id"]).";");
+		while($line = $tags->fetch())
 		{
-			if($old_type !== null)
+			if($line["type"] != $old_type || $line["id"] != $old_id)
 			{
+				if($old_type !== null)
+				{
 ?>
 		</table>
 	</li>
 <?php
-			}
+				}
 
-			switch($line["type"])
-			{
-				case 1:
-					$type = _("Node");
-					$browse = "node";
-					break;
-				case 2:
-					$type = _("Way");
-					$browse = "way";
-					break;
-				case 3:
-					$type = _("Relation");
-					$browse = "relation";
-					break;
-			}
+				switch($line["type"])
+				{
+					case 1:
+						$type = _("Node");
+						$browse = "node";
+						break;
+					case 2:
+						$type = _("Way");
+						$browse = "way";
+						break;
+					case 3:
+						$type = _("Relation");
+						$browse = "relation";
+						break;
+				}
 ?>
 	<li><?=htmlspecialchars($type." ".$line["id"])?> (<a href="http://www.openstreetmap.org/browse/<?=htmlspecialchars($browse."/".$line["id"])?>"><?=htmlspecialchars(_("browse"))?></a>)
 		<table>
 			<tbody>
 <?php
-			$old_type = $line["type"];
-			$old_id = $line["id"];
-		}
-
-		if($line["value1"] == $line["value2"])
-		{
-			$class1 = "unchanged";
-			$class2 = "unchanged";
-		}
-		else
-		{
-			$class1 = "old";
-			$class2 = "new";
-		}
-
-		$values = array();
-		foreach(array($line["value1"], $line["value2"]) as $i=>$v)
-		{
-			if(trim($v) != "")
-			{
-				if(preg_match("/^url(:|\$)/i", $line["tagname"]))
-				{
-					$v = explode(";", $v);
-					foreach($v as $k=>$v1)
-						$v[$k] = "<a href=\"".htmlspecialchars(trim($v1))."\">".htmlspecialchars($v1)."</a>";
-					$v = implode(";", $v);
-				}
-				elseif(preg_match("/^wiki(:.*)?\$/i", $line["tagname"], $m))
-				{
-					$m[1] = strtolower($m[1]);
-					$v = explode(";", $v);
-					foreach($v as $k=>$v1)
-						$v[$k] = "<a href=\"http://wiki.openstreetmap.org/wiki/".htmlspecialchars(rawurlencode(($m[1] == ":symbol" ? "Image:" : "").$v1))."\">".htmlspecialchars($v1)."</a>";
-					$v = implode(";", $v);
-				}
-				else
-					$v = htmlspecialchars($v);
+				$old_type = $line["type"];
+				$old_id = $line["id"];
 			}
-			$values[$i] = $v;
-		}
+
+			if($line["value1"] == $line["value2"])
+			{
+				$class1 = "unchanged";
+				$class2 = "unchanged";
+			}
+			else
+			{
+				$class1 = "old";
+				$class2 = "new";
+			}
+
+			$values = array();
+			foreach(array($line["value1"], $line["value2"]) as $i=>$v)
+			{
+				if(trim($v) != "")
+				{
+					if(preg_match("/^url(:|\$)/i", $line["tagname"]))
+					{
+						$v = explode(";", $v);
+						foreach($v as $k=>$v1)
+							$v[$k] = "<a href=\"".htmlspecialchars(trim($v1))."\">".htmlspecialchars($v1)."</a>";
+						$v = implode(";", $v);
+					}
+					elseif(preg_match("/^wiki(:.*)?\$/i", $line["tagname"], $m))
+					{
+						$m[1] = strtolower($m[1]);
+						$v = explode(";", $v);
+						foreach($v as $k=>$v1)
+							$v[$k] = "<a href=\"http://wiki.openstreetmap.org/wiki/".htmlspecialchars(rawurlencode(($m[1] == ":symbol" ? "Image:" : "").$v1))."\">".htmlspecialchars($v1)."</a>";
+						$v = implode(";", $v);
+					}
+					else
+						$v = htmlspecialchars($v);
+				}
+				$values[$i] = $v;
+			}
 ?>
 				<tr>
 					<th><?=htmlspecialchars($line["tagname"])?></th>
@@ -211,18 +221,32 @@
 					<td class="<?=htmlspecialchars($class2)?>"><?=$values[1]?></td>
 				</tr>
 <?php
-	}
+		}
 
-	if($old_type !== null)
-	{
+		if($old_type !== null)
+		{
 ?>
 			</tbody>
 		</table>
 	</li>
 <?php
-	}
+		}
 ?>
 </ul>
+<?php
+	}
+?>
+<h2><?=htmlspecialchars(_("Map"))?></h2>
+<?php
+	if(!$sql->query("SELECT COUNT(*) FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"]).";")->fetchColumn())
+	{
+?>
+<p class="nothing-to-do"><?=htmlspecialchars(_("No objects were changed in the changeset."))?></p>
+<?php
+	}
+	else
+	{
+?>
 <div id="map"></div>
 <script type="text/javascript">
 // <![CDATA[
@@ -263,38 +287,53 @@
 		zoomableInLayerSwitcher: true
 	});
 <?php
-	$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 1;");
-	while($segment = $segments->fetch())
+		$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 1;");
+		while($segment = $segments->fetch())
 	{
 ?>
 	layerRemoved.addNodes([new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$segment["lon1"]?>, <?=$segment["lat1"]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$segment["lon2"]?>, <?=$segment["lat2"]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-	}
+		}
 
-	$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 2;");
-	while($segment = $segments->fetch())
-	{
+		$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 2;");
+		while($segment = $segments->fetch())
+		{
 ?>
 	layerCreated.addNodes([new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$segment["lon1"]?>, <?=$segment["lat1"]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerCreated, new OpenLayers.LonLat(<?=$segment["lon2"]?>, <?=$segment["lat2"]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-	}
+		}
 
-	$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 3;");
-	while($segment = $segments->fetch())
-	{
+		$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 3;");
+		while($segment = $segments->fetch())
+		{
 ?>
 	layerUnchanged.addNodes([new OpenLayers.Feature(layerUnchanged, new OpenLayers.LonLat(<?=$segment["lon1"]?>, <?=$segment["lat1"]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerUnchanged, new OpenLayers.LonLat(<?=$segment["lon2"]?>, <?=$segment["lat2"]?>).transform(projection, map.getProjectionObject()))]);
 <?php
-	}
+		}
 ?>
 
 	map.addLayer(layerUnchanged);
 	map.addLayer(layerRemoved);
 	map.addLayer(layerCreated);
 
-	extent = layerCreated.getDataExtent();
-	extent.extend(layerRemoved.getDataExtent());
-	extent.extend(layerUnchanged.getDataExtent());
+	var extent1 = layerCreated.getDataExtent();
+	var extent2 = layerRemoved.getDataExtent();
+	var extent3 = layerUnchanged.getDataExtent();
+
+	var extent = extent1;
+	if(extent)
+	{
+		extent.extend(extent2);
+		extent.extend(extent3);
+	}
+	else
+	{
+		extent = extent2;
+		if(extent)
+			extent.extend(extend3);
+		else
+			extent = extent3;
+	}
 
 	if(extent)
 		map.zoomToExtent(extent);
@@ -303,4 +342,6 @@
 // ]]>
 </script>
 <?php
+	}
+
 	$GUI->foot();

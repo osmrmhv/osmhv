@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OSM Route Manager\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-08 01:39+0200\n"
+"POT-Creation-Date: 2009-11-02 00:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Candid Dauth <webmaster@cdauth.de>\n"
 "Language-Team: \n"
@@ -14,51 +14,91 @@ msgstr ""
 "X-Poedit-Country: GERMANY\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: ../changeset.php:22
+#: ../changeset.php:43
 #, php-format
 msgid "Changeset %s"
 msgstr "Changeset %s"
 
-#: ../changeset.php:50
+#: ../changeset.php:72
 msgid "Changeset could not be analysed."
 msgstr "Das Changeset konnte nicht analysiert werden."
 
-#: ../changeset.php:55
+#: ../changeset.php:77
 msgid "Back to home page"
 msgstr "Zur Startseite"
 
-#: ../changeset.php:56
+#: ../changeset.php:78
 msgid "Browse on OpenStreetMap"
 msgstr "Details auf OpenStreetMap nachschauen"
 
-#: ../changeset.php:65
+#: ../changeset.php:87
 msgid "Note that many features of this page will not work without JavaScript."
 msgstr "Die Funktionalität dieser Seite ist ohne JavaScript stark eingeschränkt."
 
-#: ../changeset.php:67
+#: ../changeset.php:88
 #, php-format
 msgid "This analysation was created on %s."
 msgstr "Diese Analyse wurde am %s erstellt."
 
-#: ../changeset.php:68
+#: ../changeset.php:89
+msgid "Everything green on this page will show the status after the changeset was committed, red will be the status before, and things displayed in blue haven’t changed."
+msgstr "Grüne Darstellungen auf dieser Seite präsentieren den Zustand nach dem Hochladen des Changesets, rote den davor und Blau steht für unveränderte Dinge."
+
+#: ../changeset.php:90
 msgid "Tags"
 msgstr "Tags"
 
-#: ../changeset.php:95
+#: ../changeset.php:117
 msgid "Details"
 msgstr "Details"
 
-#: ../changeset.php:97
+#: ../changeset.php:119
 msgid "Creation time"
 msgstr "Erstellt"
 
-#: ../changeset.php:100
+#: ../changeset.php:122
 msgid "Closing time"
 msgstr "Abgeschlossen"
 
-#: ../changeset.php:103
+#: ../changeset.php:125
 msgid "User"
 msgstr "Benutzer"
+
+#: ../changeset.php:128
+msgid "Changed object tags"
+msgstr "Geänderte Tags von Objekten"
+
+#: ../changeset.php:133
+msgid "No tags have been changed."
+msgstr "Es wurden keine Tags verändert."
+
+#: ../changeset.php:139
+msgid "Hover the elements to view the changed tags."
+msgstr "Fahren Sie mit der Maus über die Objekte, um deren geänderte Tags anzuzeigen."
+
+#: ../changeset.php:160
+msgid "Node"
+msgstr "Node"
+
+#: ../changeset.php:164
+msgid "Way"
+msgstr "Way"
+
+#: ../changeset.php:168
+msgid "Relation"
+msgstr "Relation"
+
+#: ../changeset.php:173
+msgid "browse"
+msgstr "browse"
+
+#: ../changeset.php:239
+msgid "Map"
+msgstr "Karte"
+
+#: ../changeset.php:244
+msgid "No objects were changed in the changeset."
+msgstr "In diesem Changeset wurden keine Objekte verändert."
 
 #: ../classes/gui.php:33
 msgid "OSM History Viewer"
@@ -85,8 +125,6 @@ msgstr "Changeset-ID"
 msgid "Lookup"
 msgstr "Analysieren"
 
-#~ msgid "Relation %s"
-#~ msgstr "Relation %s"
 #~ msgid "Open this in OSM Relation Analyzer"
 #~ msgstr "Im OSM Relation Analyzer öffnen"
 #~ msgid ""
