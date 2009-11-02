@@ -31,6 +31,9 @@ img { border-style:none; }
 .sortarrow { display:none; }
 
 #map { height:600px; border:1px solid #000; }
+#map.blame-map { width:50%; float:right; }
+
+.blame-changesets { width:48%; }
 
 ul.buttons { margin:0; padding:0; list-style-type:none; }
 ul.buttons li { display:inline; }
@@ -48,4 +51,5 @@ h1,h2,h3,h4,h5,h6 { clear:left; }
 .changed-object-tags td.new { background-color:#cfc; }
 .changed-object-tags td.unchanged { color:#666; font-style:italic; }
 
-.nothing-to-do { font-style:italic; }
+.nothing-to-do,.no-comment { font-style:italic; }
+.user-colour a { color:inherit; }

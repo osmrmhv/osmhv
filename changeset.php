@@ -50,17 +50,17 @@
 		"http://osm.cdauth.de/map/openstreetbugs.js"
 	));
 
-	$GUI->head();
-
 	if(!isset($_GET["id"]))
 	{
 		header("Location: http://".$_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]), true, 307);
 		die();
 	}
 
+	$GUI->head();
+
 	$sql = SQLite::getConnection();
 
-	$information = $sql->query("SELECT * FROM changeset_information WHERE changeset = ".$sql->quote($_GET["id"]).";")->fetch();
+	$information = $sql->query("SELECT * FROM changeset_information WHERE changeset = ".$sql->quote($_GET["id"])." LIMIT 1;")->fetch();
 	if(!$information)
 		exec("java/osmhv --cache=cache.sqlite3 --changeset=".escapeshellarg($_GET["id"]));
 	$information = $sql->query("SELECT * FROM changeset_information WHERE changeset = ".$sql->quote($_GET["id"]).";")->fetch();
@@ -288,7 +288,7 @@
 <?php
 		$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 1;");
 		while($segment = $segments->fetch())
-	{
+		{
 ?>
 	layerRemoved.addNodes([new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$segment["lon1"]?>, <?=$segment["lat1"]?>).transform(projection, map.getProjectionObject())),new OpenLayers.Feature(layerRemoved, new OpenLayers.LonLat(<?=$segment["lon2"]?>, <?=$segment["lat2"]?>).transform(projection, map.getProjectionObject()))]);
 <?php
