@@ -84,7 +84,7 @@
 				foreach($javascripts as $javascript)
 				{
 ?>
-		<script type="text/javascript" src="<?=htmlspecialchars($javascript)?>" /></script>
+		<script type="text/javascript" src="<?=htmlspecialchars($javascript)?>"></script>
 <?php
 				}
 			}
