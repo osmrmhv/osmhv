@@ -24,6 +24,8 @@
 		die();
 	}
 
+	$_GET["id"] = trim($_GET["id"]);
+
 	$GUI->option("importJavaScript", array(
 		"http://www.openlayers.org/api/OpenLayers.js",
 		"http://maps.google.com/maps?file=api&v=2&key=ABQIAAAApZR0PIISH23foUX8nxj4LxT_x5xGo0Rzkn1YRNpahJvSZYku9hTJeTmkeyXv4TuaU5kM077xJUUM7w",
