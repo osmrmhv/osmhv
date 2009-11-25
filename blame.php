@@ -117,11 +117,11 @@
 	window.onresize = function(){ document.getElementById("map").style.height = Math.round(window.innerHeight*.9)+"px"; map.updateSize(); }
 	window.onresize();
 
-	var osbLayer = new OpenLayers.Layer.OpenStreetBugs("OpenStreetBugs", { visibility: false });
+	var osbLayer = new OpenLayers.Layer.OpenStreetBugs("OpenStreetBugs", { visibility: false, shortName: "osb" });
 	map.addLayer(osbLayer);
 	osbLayer.setZIndex(500);
 
-	var layerMarkers = new OpenLayers.Layer.cdauth.markers.LonLat("Markers");
+	var layerMarkers = new OpenLayers.Layer.cdauth.Markers.LonLat("Markers", { shortName: "m" });
 	map.addLayer(layerMarkers);
 	var clickControl = new OpenLayers.Control.cdauth.CreateMarker(layerMarkers);
 	map.addControl(clickControl);
@@ -136,7 +136,7 @@
 	foreach($changesets as $changeset=>$info)
 	{
 ?>
-	layers['<?=$changeset?>'] = new OpenLayers.Layer.PointTrack("Changeset <?=$changeset?>", { styleMap : new OpenLayers.StyleMap({strokeColor: "<?=$user_colours[$info["user"]]?>", strokeWidth: 5, strokeOpacity: 0.6}), projection : projection, zoomableInLayerSwitcher : true });
+	layers['<?=$changeset?>'] = new OpenLayers.Layer.PointTrack("Changeset <?=$changeset?>", { styleMap : new OpenLayers.StyleMap({strokeColor: "<?=$user_colours[$info["user"]]?>", strokeWidth: 5, strokeOpacity: 0.6, shortName: "<?=$changeset?>"}), projection : projection, zoomableInLayerSwitcher : true });
 <?php
 		$segments = $sql->query("SELECT * FROM relation_blame WHERE relation = ".$sql->quote($_GET["id"])." AND changeset = ".$sql->quote($changeset).";");
 		while($segment = $segments->fetch())
@@ -157,6 +157,10 @@
 ?>
 	if(extent)
 		map.zoomToExtent(extent);
+
+	var hashHandler = new OpenLayers.Control.cdauth.URLHashHandler();
+	map.addControl(hashHandler);
+	hashHandler.activate();
 
 	function setGlobalVisibility(visibility)
 	{

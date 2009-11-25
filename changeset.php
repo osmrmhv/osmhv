@@ -259,11 +259,11 @@
 	var styleMapCreated = new OpenLayers.StyleMap({strokeColor: "#44ff44", strokeWidth: 3, strokeOpacity: 0.5});
 	var styleMapRemoved = new OpenLayers.StyleMap({strokeColor: "#ff0000", strokeWidth: 3, strokeOpacity: 0.5});
 
-	var osbLayer = new OpenLayers.Layer.OpenStreetBugs("OpenStreetBugs", { visibility: false });
+	var osbLayer = new OpenLayers.Layer.OpenStreetBugs("OpenStreetBugs", { shortName: "osb", visibility: false });
 	map.addLayer(osbLayer);
 	osbLayer.setZIndex(500);
 
-	var layerMarkers = new OpenLayers.Layer.cdauth.markers.LonLat("Markers");
+	var layerMarkers = new OpenLayers.Layer.cdauth.Markers.LonLat("Markers", { shortName: "m" });
 	map.addLayer(layerMarkers);
 	var clickControl = new OpenLayers.Control.cdauth.CreateMarker(layerMarkers);
 	map.addControl(clickControl);
@@ -273,17 +273,20 @@
 	var layerCreated = new OpenLayers.Layer.PointTrack("(Created)", {
 		styleMap: styleMapCreated,
 		projection: projection,
-		zoomableInLayerSwitcher: true
+		zoomableInLayerSwitcher: true,
+		shortName: "created"
 	});
 	var layerRemoved = new OpenLayers.Layer.PointTrack("(Removed)", {
 		styleMap: styleMapRemoved,
 		projection: projection,
-		zoomableInLayerSwitcher: true
+		zoomableInLayerSwitcher: true,
+		shortName: "removed"
 	});
 	var layerUnchanged = new OpenLayers.Layer.PointTrack("(Unchanged)", {
 		styleMap: styleMapUnchanged,
 		projection: projection,
-		zoomableInLayerSwitcher: true
+		zoomableInLayerSwitcher: true,
+		shortName: "unchanged"
 	});
 <?php
 		$segments = $sql->query("SELECT * FROM changeset_changes WHERE changeset = ".$sql->quote($_GET["id"])." AND action = 1;");
@@ -338,6 +341,10 @@
 		map.zoomToExtent(extent);
 	else
 		map.zoomToMaxExtent();
+
+	var hashHandler = new OpenLayers.Control.cdauth.URLHashHandler();
+	map.addControl(hashHandler);
+	hashHandler.activate();
 // ]]>
 </script>
 <?php
