@@ -332,7 +332,7 @@
 	{
 		extent = extent2;
 		if(extent)
-			extent.extend(extend3);
+			extent.extend(extent3);
 		else
 			extent = extent3;
 	}
