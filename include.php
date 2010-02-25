@@ -27,7 +27,8 @@
 
 	$languages = array (
 		"de_DE" => array("de_DE.utf8", "de_DE@utf8", "de_DE", "de", "german", "ger", "deutsch", "deu"),
-		"en_GB" => array("en_GB.utf8", "en_GB@utf8", "en_US.utf8", "en_US@utf8", "en", "english", "eng")
+		"en_GB" => array("en_GB.utf8", "en_GB@utf8", "en_US.utf8", "en_US@utf8", "en", "english", "eng"),
+		"hu_HU" => array("hu_HU.utf8", "hu_HU@utf8", "hu_HU", "hu", "hun")
 	);
 	if(isset($_GET["lang"]) && isset($languages[$_GET["lang"]]))
 	{

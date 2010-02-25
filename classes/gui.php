@@ -93,7 +93,7 @@
 	<body<?=$this->option("bodyClass") ? " class=\"".htmlspecialchars($this->option("bodyClass"))."\"" : ""?>>
 		<h1><?=htmlspecialchars($title)?></h1>
 <?php
-			$languages = array("en_GB" => "English", "de_DE" => "Deutsch");
+			$languages = array("en_GB" => "English", "de_DE" => "Deutsch", "hu_HU" => "Magyar");
 			$url_prefix = "?";
 			if(strlen($_SERVER["QUERY_STRING"]) > 0)
 				$url_prefix .= $_SERVER["QUERY_STRING"]."&";
