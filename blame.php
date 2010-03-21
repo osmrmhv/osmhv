@@ -44,7 +44,7 @@
 	$user_changes = array();
 
 	if(!$sql->query("SELECT * FROM relation_blame WHERE relation = ".$sql->quote($_GET["id"])." LIMIT 1;")->fetch())
-		exec("java/osmhv --cache=cache.sqlite3 --blame=".escapeshellarg($_GET["id"]));
+		exec("java/osmhv.sh --cache=cache.sqlite3 --blame=".escapeshellarg($_GET["id"]));
 
 	$changesets_sql = $sql->query("SELECT DISTINCT changeset FROM relation_blame WHERE relation = ".$sql->quote($_GET["id"])." ORDER BY changeset DESC;");
 	while($changeset = $changesets_sql->fetch())

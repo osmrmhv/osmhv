@@ -62,7 +62,7 @@
 
 	$information = $sql->query("SELECT * FROM changeset_information WHERE changeset = ".$sql->quote($_GET["id"])." LIMIT 1;")->fetch();
 	if(!$information)
-		exec("java/osmhv --cache=cache.sqlite3 --changeset=".escapeshellarg($_GET["id"]));
+		exec("java/osmhv.sh --cache=cache.sqlite3 --changeset=".escapeshellarg($_GET["id"]));
 	$information = $sql->query("SELECT * FROM changeset_information WHERE changeset = ".$sql->quote($_GET["id"]).";")->fetch();
 	if(!$information || !$information["closed"])
 	{
